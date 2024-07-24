@@ -20,7 +20,7 @@ const registerUser = asyncHandler(async (req,res) => {
 // return response
 
     const {fullName , email , username , password} = req.body  
-    console.log("email:", email);
+    // console.log("email:", email);
       /*
       if (fullName ==="") {
         throw new ApiError(400,"fullname is requried")
@@ -42,7 +42,7 @@ const registerUser = asyncHandler(async (req,res) => {
 
 
   // Debugging: Log the req.files object
-  console.log("req.files:", req.files);
+  // console.log("req.files:", req.files);
 
 
 
