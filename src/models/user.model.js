@@ -58,11 +58,11 @@ const userSchema = new Schema(
 
 
 userSchema.pre("save", async function (next){
-    if(this.isModified("password")) return next();
+    if(!this.isModified("password")) return next();
     // check if pass is modified or not.
 
-    this.password = await bcrypt.hash(this.password,8)
-    next()
+    this.password = await bcrypt.hash(this.password,8);
+    next();
 })
 // Hashed password before saving in the database.
 
@@ -91,7 +91,7 @@ userSchema.methods.generateAccessToken = function(){
 // Generate access token for the user.
 
 
-userSchema.methods.generateReFreshToken = function(){
+userSchema.methods.generateRefreshToken = function(){
     return jwt.sign(
         {
             _id: this._id

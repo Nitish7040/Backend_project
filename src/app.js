@@ -6,6 +6,9 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 // import userRouter from "./routes/user.routes.js";
 
+import { upload } from "./middlewares/multer.middleware.js";
+import { registerUser } from "./controllers/user.controller.js";
+
 dotenv.config({
     path: './.env'
 });
@@ -44,6 +47,8 @@ app.use("/api/v1/users", userRouter);
 
 // http://localhost:8000/api/v1/users/register
 
+// Apply the middleware to the route
+app.post('/register', upload.fields([{ name: 'avatar', maxCount: 1 }, { name: 'coverImage', maxCount: 1 }]), registerUser);
 
 
 
