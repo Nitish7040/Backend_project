@@ -299,7 +299,7 @@ const getCurrentUser = asyncHandler(async(req ,res) =>{
 
 // update account details
   // always make file update controller in onother file
-  
+
 const updateAccountDetails = asyncHandler(async(req , res) =>{
 
   const{fullName , email} = req.body
@@ -396,9 +396,9 @@ const updateUserCoverImage =asyncHandler(async(req ,res) => {
 export {
        registerUser ,
         loginUser ,
-         logoutUser,
+        logoutUser,
         refreshAccessToken,
-         getCurrentUser,
+        getCurrentUser,
         changeCurrentPassword,
         updateAccountDetails,
         updateUserAvatar,
