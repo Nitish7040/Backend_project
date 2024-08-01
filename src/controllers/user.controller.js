@@ -396,6 +396,100 @@ const updateUserCoverImage =asyncHandler(async(req ,res) => {
 })
 
 
+// user channel profile
+
+const getUserChannelProfile = asyncHandler(async (req , res ) => {
+  
+  const {username} = req.params
+     if (!username?.trim) {
+      throw new ApiError(400, "username is missing")
+     }
+// mongodb pipeline like sde2
+
+  // await user.find({username})
+  const channel = await User.aggregate([
+       {
+// pipeline for user match
+        $match: {
+          username: username?.toLowerCase()
+        },
+// count subscribers through channels
+        $lookup :{
+            from : "Subscription",
+            localField : "_id",
+            foreignField : "channel",
+            as : "subscribers"
+          }
+        
+       },
+// how many we are subscribed
+        {
+          $lookup :{
+            from : "Subscription",
+            localField : "_id",
+            foreignField : "subscriber",
+            as : "subscribedTo"
+          }
+        },
+// add fields like subcribercount , channnel subs , issubscribed
+
+        {
+          $addFields:{
+            subscriberCount : { 
+              $size : "$subscribers"
+             },
+            channelsSubscribedToCount :{
+              $size : "$subscribedTo"
+            },
+    // subscribe buttons logic
+        isSubscribed :{
+          $cond :{
+            if : {$in: [req.user?._id, "$subscribers.subscriber"]},
+              then: true,
+              else : false
+          }
+        }
+          }
+        },
+// select item to prject on frontend
+        {
+          $project :{
+            fullName:1,
+            username:1,
+            subscriberCount:1,
+            channelsSubscribedToCount:1,
+            isSubscribed :1,
+            avatar:1,
+            coverImage:1,
+            email:1
+
+          }
+        }
+  ])
+
+
+  if (!channel?.length) {
+    throw new ApiError(400,"channel does not exits")
+  }
+
+
+return res
+.status(200)
+.json(
+  new ApiResponce(200, channel[0], "User channel fetched sucessfully")
+)
+})
+
+
+
+
+
+
+
+
+
+
+
 export {
        registerUser ,
         loginUser ,
@@ -406,4 +500,5 @@ export {
         updateAccountDetails,
         updateUserAvatar,
         updateUserCoverImage,
+        getUserChannelProfile,
 };
