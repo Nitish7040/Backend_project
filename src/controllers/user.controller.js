@@ -6,6 +6,7 @@ import {User} from "../models/user.model.js";
 import {uploadOnCloudinary} from "../Utils/cloudinary.js";
 import { ApiResponce} from "../Utils/ApiResponse.js";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
 // user registration controller
 
@@ -471,7 +472,7 @@ const getUserChannelProfile = asyncHandler(async (req , res ) => {
   if (!channel?.length) {
     throw new ApiError(400,"channel does not exits")
   }
-
+// console.log(channel);
 
 return res
 .status(200)
@@ -482,6 +483,63 @@ return res
 
 
 
+// Watch history ............
+
+const getWatchHistory = asyncHandler(async (req, res => {
+  //await
+  const user =  User.aggregate([
+    {
+      $match: {
+        _id: new mongoose.Types.ObjectId(req.user._id)
+      }
+    },
+    {
+      $lookup:{
+        from : "videos",
+        localField : "watchHistory",
+        foreignField : "_id",
+        as : "watchHistory",
+        pipeline:[
+          {
+            $lookup:{
+              from : "users",
+              localField : "owner",
+              foreignField : "_id",
+              as : "owner",
+        pipeline:[
+          {
+            $project:{
+              fullName:1,
+              username:1,
+              avatar:1
+            }
+          }
+        ]
+            }
+          },
+          {
+    // for frontend
+           $addFields:{
+            owner:{
+              $first :"$owner"
+            }
+           }
+          }
+        ]
+      }
+    }
+  ])
+
+return res
+.status(200)
+.json(
+  new ApiResponce(
+    200,
+    user[0].WatchHistory,
+    "watch history fetched successfully"
+  )
+)
+}))
 
 
 
@@ -501,4 +559,5 @@ export {
         updateUserAvatar,
         updateUserCoverImage,
         getUserChannelProfile,
+        getWatchHistory ,
 };
