@@ -184,8 +184,8 @@ const logoutUser = asyncHandler (async(req ,res) => {
         User.findByIdAndUpdate(
           req.user._id,
           {
-            $set :{
-              refreshToken : undefined
+            $unset :{
+              refreshToken : 1
             }
           },
           {
@@ -485,9 +485,9 @@ return res
 
 // Watch history ............
 
-const getWatchHistory = asyncHandler(async (req, res => {
+const getWatchHistory = asyncHandler(async (req, res )=> {
   //await
-  const user =  User.aggregate([
+  const user = await  User.aggregate([
     {
       $match: {
         _id: new mongoose.Types.ObjectId(req.user._id)
@@ -496,9 +496,9 @@ const getWatchHistory = asyncHandler(async (req, res => {
     {
       $lookup:{
         from : "videos",
-        localField : "watchHistory",
-        foreignField : "_id",
-        as : "watchHistory",
+        localField: 'watchHistory',
+        foreignField: '_id',
+        as: 'watchHistory',
         pipeline:[
           {
             $lookup:{
@@ -535,11 +535,11 @@ return res
 .json(
   new ApiResponce(
     200,
-    user[0].WatchHistory,
+    user[0].watchHistory,
     "watch history fetched successfully"
   )
 )
-}))
+})
 
 
 
